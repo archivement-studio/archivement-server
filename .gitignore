@@ -1,0 +1,8 @@
+### virtualvenv
+.venv
+
+### poetry.lock
+poetry.lock
+
+### python verstion
+.python-version
