@@ -1,0 +1,14 @@
+version: '3'
+services:
+  archivement-server:
+    container_name: archivement-server
+    image: 186952256580.dkr.ecr.ap-northeast-2.amazonaws.com/archivement-server:latest
+    networks:
+      - archivement-network
+    restart: always
+    ports:
+    - "8080:8080"
+
+networks:
+  archivement-network:
+    external: true

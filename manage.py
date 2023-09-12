@@ -7,7 +7,7 @@ import uvicorn
 from typing import Optional
 
 def run_server(host: Optional[str] = None, port: Optional[int] = None, build:str = "dev") -> None:
-    host = host or '0.0.0.0'
+    host = host or "0.0.0.0"
     port = port or 8080
     app = create_app()
 

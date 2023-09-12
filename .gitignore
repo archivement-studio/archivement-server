@@ -9,3 +9,6 @@ poetry.lock
 
 ### python cache ###
 __pycache__
+
+### dockerfile ###
+docker-compose
