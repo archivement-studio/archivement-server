@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <style>
+        body{
+            background: #000;
+        }
+        #download-div{
+            display: flex;
+            margin-top: 17vh;
+        }
+        #download-image{
+            width: 90%;
+            margin: 0 auto;
+            border-radius: 7px;
+        }
+        #how-download{
+            font-family: Pretendard;
+            color: #fff;
+
+            font-size: 5vw;
+            margin-top: 61px;
+            text-align: center;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div id="download-div">
+            <img id="download-image" src= {{ image_url }} alt=""/>
+        </div>
+        <div>
+            <h1 id="how-download">이미지를 길게 눌러 사진앱에 저장하세요.</h1>
+        </div>
+    </div>
+</body>
+</html>
