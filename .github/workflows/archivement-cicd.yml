@@ -43,6 +43,7 @@ jobs:
     - name: Docker build & push to ECR
       if: contains(github.ref, 'dev')
       run: |
+          sudo aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 186952256580.dkr.ecr.ap-northeast-2.amazonaws.com
           sudo docker build --platform linux/amd64 -t ${{ secrets.ECR_REPO }} .
           sudo docker tag ${{ secrets.ECR_REPO }}:latest ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
           echo "melon"
