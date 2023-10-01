@@ -39,12 +39,13 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     ## docker build & push to production
+    # sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
     - name: Docker build & push to ECR
       if: contains(github.ref, 'dev')
       run: |
-          sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
           sudo docker build --platform linux/amd64 -t ${{ secrets.ECR_REPO }} .
           sudo docker tag ${{ secrets.ECR_REPO }}:latest ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
+          echo "melon"
           sudo docker push ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
 
     # ## deploy to production
