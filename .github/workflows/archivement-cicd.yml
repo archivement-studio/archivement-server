@@ -59,9 +59,17 @@ jobs:
           key: ${{ secrets.ARCHIVEMENT_PRIVATE_KEY }}
           script: |
               sudo apt-get update
+              cd ./archivement-server
+              echo "hello"
               sudo docker compose down
+              echo "hello world"
               sudo docker rmi $(sudo docker images -q)
+              echo "hello father"
               sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
+              echo "hello dragon"
               docker pull ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
+              echo "hello mother"
               sudo docker image prune -f
+              echo "hello grandman"
               sudo docker compose up -d
+              echo "hello pistol"
