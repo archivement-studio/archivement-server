@@ -41,6 +41,10 @@ jobs:
       with:
           script: |
                 sudo aws configure list
+                sudo docker build --platform linux/amd64 -t ${{ secrets.ECR_REPO }} .
+                sudo docker tag ${{ secrets.ECR_REPO }}:latest ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
+                echo "melon"
+                sudo docker push ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
 
     ## docker build & push to production
     # sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
