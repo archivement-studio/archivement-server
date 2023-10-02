@@ -46,6 +46,7 @@ jobs:
           script: |
               sudo apt-get update
               cd ./archivement-server
+              sudo touch lemon.txt
               sudo docker compose down
               echo "hello"
               sudo docker rmi $(sudo docker images -q)
