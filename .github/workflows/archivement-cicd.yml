@@ -26,13 +26,12 @@ jobs:
         aws-region: ${{ secrets.ECR_REGION }}
 
     ## docker build & push to production
-    - name: Docker build & push to ECR
+    - name: Docker build & push
       if: contains(github.ref, 'dev')
       run: |
-          sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
-          sudo docker build --platform linux/amd64 -t ${{ secrets.ECR_REPO }} .
-          sudo docker tag ${{ secrets.ECR_REPO }}:latest ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
-          sudo docker push ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
+          sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          sudo docker build --platform linux/amd64 -t ${{ secrets.DOCKER_REPO }} .
+          sudo docker push ${{ secrets.DOCKER_REPO }}
 
     # ## deploy to production
     - name: Deploy to prod
@@ -48,13 +47,37 @@ jobs:
               sudo apt-get update
               cd ./archivement-server
               sudo docker compose down
-              echo "hello"
               sudo docker rmi $(sudo docker images -q)
-              echo "hello world"
-              sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
-              docker pull ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
-              echo "hello father"
+              sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+              sudo docker pull ${{ secrets.DOCKER_REPO }}
               sudo docker image prune -f
-              echo "hello mother"
               sudo docker compose up -d
-              echo "hello grandman"
+
+    # ## docker build & push to production
+    # - name: Docker build & push to ECR
+    #   if: contains(github.ref, 'dev')
+    #   run: |
+    #       sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
+    #       sudo docker build --platform linux/amd64 -t ${{ secrets.ECR_REPO }} .
+    #       sudo docker tag ${{ secrets.ECR_REPO }}:latest ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
+    #       sudo docker push ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
+
+    # # ## deploy to production
+    # - name: Deploy to prod
+    #   uses: appleboy/ssh-action@master
+    #   id: deploy-prod
+    #   if: contains(github.ref, 'main')
+    #   with:
+    #       host: ${{ secrets.ARCHIVEMENT_SERVER_HOST }}
+    #       username: ${{ secrets.ARCHIVEMENT_SERVER_USERNAME }}
+    #       port: ${{ secrets.ARCHIVEMENT_SERVER_PORT }}
+    #       key: ${{ secrets.ARCHIVEMENT_PRIVATE_KEY }}
+    #       script: |
+    #           sudo apt-get update
+    #           cd ./archivement-server
+    #           sudo docker compose down
+    #           sudo docker rmi $(sudo docker images -q)
+    #           sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
+    #           docker pull ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
+    #           sudo docker image prune -f
+    #           sudo docker compose up -d
