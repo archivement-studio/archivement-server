@@ -46,16 +46,9 @@ jobs:
           script: |
               sudo apt-get update
               cd ./archivement-server
-              sudo touch lemon.txt
               sudo docker compose down
-              echo "hello"
               sudo docker rmi $(sudo docker images -q)
-              echo "hello world"
               sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-              echo "hello father"
               sudo docker pull ${{ secrets.DOCKER_REPO }}
-              echo "hello mother"
               sudo docker image prune -f
-              echo "hello grandman"
               sudo docker compose up -d
-              echo "hello hostman"
