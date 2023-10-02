@@ -26,6 +26,26 @@ jobs:
           sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           sudo docker build --platform linux/amd64 -t ${{ secrets.DOCKER_REPO }} .
           sudo docker push ${{ secrets.DOCKER_REPO }}
+
+    # ## deploy to production
+    - name: Deploy to prod
+      uses: appleboy/ssh-action@master
+      id: deploy-prod
+      if: contains(github.ref, 'main')
+      with:
+          host: ${{ secrets.ARCHIVEMENT_SERVER_HOST }}
+          username: ${{ secrets.ARCHIVEMENT_SERVER_USERNAME }}
+          port: ${{ secrets.ARCHIVEMENT_SERVER_PORT }}
+          key: ${{ secrets.ARCHIVEMENT_PRIVATE_KEY }}
+          script: |
+              sudo apt-get update
+              cd ./archivement-server
+              sudo docker compose down
+              sudo docker rmi $(sudo docker images -q)
+              sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+              sudo docker pull ${{ secrets.DOCKER_REPO }}
+              sudo docker image prune -f
+              sudo docker compose up -d
     
     ## aws credentials 생성
     # - name: Configure AWS credentials
@@ -66,28 +86,21 @@ jobs:
     #       sudo docker push ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
 
     # ## deploy to production
-    - name: Deploy to prod
-      uses: appleboy/ssh-action@master
-      id: deploy-prod
-      if: contains(github.ref, 'main')
-      with:
-          host: ${{ secrets.ARCHIVEMENT_SERVER_HOST }}
-          username: ${{ secrets.ARCHIVEMENT_SERVER_USERNAME }}
-          port: ${{ secrets.ARCHIVEMENT_SERVER_PORT }}
-          key: ${{ secrets.ARCHIVEMENT_PRIVATE_KEY }}
-          script: |
-              sudo apt-get update
-              cd ./archivement-server
-              echo "hello"
-              sudo docker compose down
-              echo "hello world"
-              sudo docker rmi $(sudo docker images -q)
-              echo "hello father"
-              sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
-              echo "hello dragon"
-              docker pull ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
-              echo "hello mother"
-              sudo docker image prune -f
-              echo "hello grandman"
-              sudo docker compose up -d
-              echo "hello pistol"
+    # - name: Deploy to prod
+    #   uses: appleboy/ssh-action@master
+    #   id: deploy-prod
+    #   if: contains(github.ref, 'main')
+    #   with:
+    #       host: ${{ secrets.ARCHIVEMENT_SERVER_HOST }}
+    #       username: ${{ secrets.ARCHIVEMENT_SERVER_USERNAME }}
+    #       port: ${{ secrets.ARCHIVEMENT_SERVER_PORT }}
+    #       key: ${{ secrets.ARCHIVEMENT_PRIVATE_KEY }}
+    #       script: |
+    #           sudo apt-get update
+    #           cd ./archivement-server
+    #           sudo docker compose down
+    #           sudo docker rmi $(sudo docker images -q)
+    #           sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
+    #           docker pull ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
+    #           sudo docker image prune -f
+    #           sudo docker compose up -d
