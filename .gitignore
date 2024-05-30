@@ -9,3 +9,12 @@ poetry.lock
 
 ### python cache ###
 __pycache__
+
+### dockerfile ###
+docker-compose
+
+### env ###
+resources/env
+
+### cache ###
+.DS_Store
