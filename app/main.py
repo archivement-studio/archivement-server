@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+
+from app.core.awsconfig import s3, dynamodb
 from app.core.config.middleware.corsconfg import set_cors
 from app.domain.base import routers
 import os

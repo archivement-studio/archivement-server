@@ -11,6 +11,9 @@ from app.core.config.serverconfig import ServerConfig
 # Test
 from test.base import testFunc
 
+# Test
+from app.test.base import testFunc
+
 def run_server(host: Optional[str] = None, port: Optional[int] = None, build:str = "dev") -> None:
     ServerConfig(build)
 
