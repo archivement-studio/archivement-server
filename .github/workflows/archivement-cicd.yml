@@ -1,0 +1,106 @@
+name: archivement-cicd CI/CD
+
+# event trigger
+on:
+  push:
+    branches:
+      - dev
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  CI-CD:
+    runs-on: ubuntu-latest
+    steps:
+
+    ## github checkout
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    ## docker build & push to production
+    - name: Docker build & push
+      if: contains(github.ref, 'dev')
+      run: |
+          sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          sudo docker build --platform linux/amd64 -t ${{ secrets.DOCKER_REPO }} .
+          sudo docker push ${{ secrets.DOCKER_REPO }}
+
+    # ## deploy to production
+    - name: Deploy to prod
+      uses: appleboy/ssh-action@master
+      id: deploy-prod
+      if: contains(github.ref, 'main')
+      with:
+          host: ${{ secrets.ARCHIVEMENT_SERVER_HOST }}
+          username: ${{ secrets.ARCHIVEMENT_SERVER_USERNAME }}
+          port: ${{ secrets.ARCHIVEMENT_SERVER_PORT }}
+          key: ${{ secrets.ARCHIVEMENT_PRIVATE_KEY }}
+          script: |
+              sudo apt-get update
+              cd ./archivement-server
+              sudo docker compose down
+              sudo docker rmi $(sudo docker images -q)
+              sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+              sudo docker pull ${{ secrets.DOCKER_REPO }}
+              sudo docker image prune -f
+              sudo docker compose up -d
+    
+    ## aws credentials 생성
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     role-to-assume: arn:aws:iam::186952256580:user/archivement-user
+    #     aws-region: ap-northeast-2
+    #${{ secrets.ECR_REGION }}
+
+    # aws credentials 생성
+    #${{ secrets.AWS_ACCESS_KEY }}
+    #${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v1
+    #   with:
+    #     aws-access-key-id: AKIASXBZZBRCJWH23AQ5
+    #     aws-secret-access-key: 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
+    #     aws-region: ap-northeast-2
+
+    # - name: Login to Amazon ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v1
+    
+    # - name: Login to Amazon ECR
+    #   run: |
+    #       sudo aws configure list
+
+          
+    ## docker build & push to production
+    # sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
+    # - name: Docker build & push to ECR
+    #   if: contains(github.ref, 'dev')
+    #   run: |
+    #       sudo aws configure list
+    #       sudo docker build --platform linux/amd64 -t ${{ secrets.ECR_REPO }} .
+    #       sudo docker tag ${{ secrets.ECR_REPO }}:latest ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
+    #       echo "melon"
+    #       sudo docker push ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
+
+    # ## deploy to production
+    # - name: Deploy to prod
+    #   uses: appleboy/ssh-action@master
+    #   id: deploy-prod
+    #   if: contains(github.ref, 'main')
+    #   with:
+    #       host: ${{ secrets.ARCHIVEMENT_SERVER_HOST }}
+    #       username: ${{ secrets.ARCHIVEMENT_SERVER_USERNAME }}
+    #       port: ${{ secrets.ARCHIVEMENT_SERVER_PORT }}
+    #       key: ${{ secrets.ARCHIVEMENT_PRIVATE_KEY }}
+    #       script: |
+    #           sudo apt-get update
+    #           cd ./archivement-server
+    #           sudo docker compose down
+    #           sudo docker rmi $(sudo docker images -q)
+    #           sudo aws ecr get-login-password --region ${{ secrets.ECR_REGION }} | docker login --username ${{ secrets.ECR_USERNAME }} --password-stdin ${{ secrets.ECR_PASSWORD }}
+    #           docker pull ${{ secrets.ECR_PASSWORD }}/${{ secrets.ECR_REPO }}:latest
+    #           sudo docker image prune -f
+    #           sudo docker compose up -d
